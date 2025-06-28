@@ -4,6 +4,7 @@ from collections import defaultdict
 import pandas as pd
 import torch
 import argparse
+import matplotlib.pyplot as plt
 
 from cybench.config import (
     DATASETS,
@@ -25,6 +26,7 @@ from cybench.models.nn_models import (
     BaselineInceptionTime,
     BaselineTransformer,
 )
+from cybench.models.reg_tree_models import RegressionTree
 
 from cybench.models.residual_models import (
     RidgeRes,
@@ -48,6 +50,7 @@ _BASELINE_MODEL_CONSTRUCTORS = {
     "InceptionTimeRes": InceptionTimeRes,
     "Transformer": BaselineTransformer,
     "TransformerRes": TransformerRes,
+    "RegressionTree": RegressionTree,
 }
 
 BASELINE_MODELS = list(_BASELINE_MODEL_CONSTRUCTORS.keys())
@@ -112,8 +115,10 @@ def run_benchmark(
     Returns:
         a dictionary containing the results of the benchmark
     """
-    baseline_models = baseline_models or BASELINE_MODELS
-    assert all([name in BASELINE_MODELS for name in baseline_models])
+    # baseline_models = baseline_models or BASELINE_MODELS
+    # assert all([name in BASELINE_MODELS for name in baseline_models])
+    #baseline_models = ["RegressionTree",]
+    baseline_models = ["LSTM",]
 
     model_init_kwargs = model_init_kwargs or dict()
     model_fit_kwargs = model_fit_kwargs or dict()
@@ -151,11 +156,17 @@ def run_benchmark(
 
     dataset = Dataset.load(dataset_name)
     all_years = sorted(dataset.years)
+    # print("Top 3 rows of dataset:")
+    # print(dataset._df_y.head(3))
+        
+        
+
     if sel_years is not None:
         assert all([yr in all_years for yr in sel_years])
     else:
         sel_years = all_years
-
+        
+            
     for test_year in sel_years:
         train_years = [y for y in all_years if y != test_year]
         test_years = [test_year]
@@ -181,6 +192,26 @@ def run_benchmark(
             model = model_constructor(**models_init_kwargs[model_name])
             model.fit(train_dataset, **models_fit_kwargs[model_name])
             predictions, _ = model.predict(test_dataset)
+            if test_year == all_years[-1]:
+                # print("len of predictions:", len(predictions))
+                # print("len of train_dataset:", len(train_dataset))
+                # print("labels", labels)
+                plt.figure(figsize=(8, 6))
+                plt.scatter(labels, predictions, label=model_name, alpha=0.7)
+                plt.xlabel("Actual Yield")
+                plt.ylabel("Predicted Yield")
+                plt.title("Predicted vs Actual Yield")
+                plt.tight_layout()
+
+                project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+                model_results_dir = os.path.join(project_root, "model_results")
+                #os.makedirs(model_results_dir, exist_ok=True)
+                plot_path = os.path.join(model_results_dir, f"pred_vs_actual_plot_{model_name}.png")
+
+                #plot_path = os.path.join(path_results, f"pred_vs_actual_plot_{model_name}.png")
+                plt.savefig(plot_path)
+                plt.close()
+
             model_output[model_name] = predictions
 
         df = pd.DataFrame.from_dict(model_output)
@@ -347,12 +378,14 @@ if __name__ == "__main__":
     if (args.mode is not None) and args.mode == "test":
         # skipping some models
         baseline_models = [
-            "AverageYieldModel",
-            "LinearTrend",
-            "SklearnRidge",
-            "RidgeRes",
-            "LSTM",
-            "LSTMRes",
+            # "AverageYieldModel",
+            # "LinearTrend",
+            # "SklearnRidge",
+            # "RidgeRes",
+            # "LSTM",
+            # "LSTMRes",
+            "RegressionTree",
+            #"SklearnRF",
         ]
         # override epochs for nn-models
         nn_models_epochs = 5

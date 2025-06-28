@@ -8,6 +8,14 @@ from cybench.config import (
     KEY_DATES,
     GDD_BASE_TEMP,
     GDD_UPPER_LIMIT,
+    INIT_LAI,
+    ALPHA,
+    LAIMAX,
+    TTL,
+    INIT_B,
+    RUE,
+    K,
+    TTM,
 )
 
 
@@ -294,6 +302,58 @@ def design_features(
         "prec"
     ].cumsum()
 
+    weather_df["et0"] = weather_df["et0"].astype(float)
+
+    '''
+    weather df row 
+    Pandas(Index=0, adm_id='NL11', year=2008, date=Timestamp('2008-01-11 00:00:00'), tmin=8.57260964871809, tmax=9.95814386723888, tavg=9.30989767772829, prec=10.7108574653055, cwb=9.940826725591643, rad=931525.510146468, period=1, gdd=0.0, cum_gdd=0.0, cum_cwb=9.940826725591643, cum_prec=10.7108574653055)
+    
+    dLAI(t) = ALPHA * dTT(t) * LAI(t) * max(0, LAIMAX - LAI(t)) for TT(t) <= TTL
+    dLAI(t) = 0 for TT(t) > TTL    
+    '''
+
+    weather_df["lai"] = 0.0
+    for (loc, year), group in weather_df.groupby(index_cols, observed=True):
+        #print("for loc, year", loc, year)
+        group = group.sort_values("date")
+        lai = INIT_LAI
+        cum_tt = 0.0
+        lai_list = []
+
+        for _, row in group.iterrows():
+            dtt = row["gdd"]
+            cum_tt += dtt
+            if cum_tt <= TTL:
+                dlai = ALPHA * dtt * lai * max(LAIMAX - lai, 0)
+                lai += dlai
+            lai_list.append(lai)
+
+        weather_df.loc[group.index, "lai"] = lai_list
+        #print("for loc, year" + str(loc) + "," + str(year) + ", the lai_list is: ", lai_list)
+    
+    weather_df["bgr"] = 0.0 #biomass growth rate
+    for (loc, year), group in weather_df.groupby(index_cols, observed=True):
+        group = group.sort_values("date")
+        bgr = INIT_B
+        cum_tt = 0.0
+        dbt_list = []
+
+        for _, row in group.iterrows():
+            #dbt = RUE * (1-e^-K * LAI) * radiation for TT(t) <= TTM
+            #dbt = 0 for TT(t) > TTM
+            dtt = row["gdd"]
+            cum_tt += dtt
+            if cum_tt <= TTM:
+                dbt = RUE * (1 - np.exp(-K * row["lai"])) * row["rad"]
+                bgr += dbt
+            dbt_list.append(bgr)
+        
+        weather_df.loc[group.index, "bgr"] = dbt_list
+        #print("for loc, year" + str(loc) + "," + str(year) + ", the dbt_list is: ", dbt_list)
+        
+
+    #print("first 20 lai values", weather_df["lai"].head(20))
+    
     if fpar_df is not None:
         fpar_df = fpar_df.sort_values(by=index_cols + ["date"])
         fpar_df["fpar"] = fpar_df["fpar"].astype(float)
@@ -309,8 +369,8 @@ def design_features(
         ].cumsum()
 
     # Aggregate by period
-    avg_weather_cols = ["tmin", "tmax", "tavg", "prec", "rad", "cum_cwb"]
-    max_weather_cols = ["cum_gdd", "cum_prec"]
+    avg_weather_cols = ["tmin", "tmax", "tavg", "prec", "rad", "cum_cwb", "lai", "et0"]
+    max_weather_cols = ["cum_gdd", "cum_prec", "lai", "bgr"]
     avg_weather_aggrs = {ind: "mean" for ind in avg_weather_cols}
     max_weather_aggrs = {ind: "max" for ind in max_weather_cols}
     avg_ft_cols = {ind: "mean_" + ind for ind in avg_weather_cols}

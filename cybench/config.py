@@ -64,6 +64,7 @@ DATASETS = {
         "US",
         "ZA",
         "ZM",
+        "Indiana"
     ],
     "wheat": [
         "AR",
@@ -125,7 +126,7 @@ SOIL_PROPERTIES = ["awc", "bulk_density"]  # , "drainage_class"]
 STATIC_PREDICTORS = SOIL_PROPERTIES
 
 # Weather indicators
-METEO_INDICATORS = ["tmin", "tmax", "tavg", "prec", "cwb", "rad"]
+METEO_INDICATORS = ["tmin", "tmax", "tavg", "prec", "cwb", "rad", "et0"]
 
 # Remote sensing indicators.
 # Keep them separate because they have different temporal resolution
@@ -156,6 +157,7 @@ TIME_SERIES_AGGREGATIONS = {
     RS_FPAR: "mean",
     RS_NDVI: "mean",
     "ssm": "mean",
+    "et0": "mean",
 }
 
 # All predictors. Add more when available
@@ -179,6 +181,15 @@ GDD_UPPER_LIMIT = {
     "wheat": None,
 }
 
+INIT_LAI = 0.01
+ALPHA = 0.00243 
+LAIMAX = 7.0 
+TTL = 700 
+
+INIT_B = 0.0
+RUE = 1.75
+K = 0.17
+TTM = 1200
 
 # Lead time for forecasting
 # Choices: "middle-of-season", "quarter-of-season",
