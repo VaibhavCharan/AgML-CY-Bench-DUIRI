@@ -115,10 +115,10 @@ def run_benchmark(
     Returns:
         a dictionary containing the results of the benchmark
     """
-    # baseline_models = baseline_models or BASELINE_MODELS
-    # assert all([name in BASELINE_MODELS for name in baseline_models])
+    baseline_models = baseline_models or BASELINE_MODELS
+    assert all([name in BASELINE_MODELS for name in baseline_models])
     #baseline_models = ["RegressionTree",]
-    baseline_models = ["LSTM",]
+    #baseline_models = ["LSTM",]
 
     model_init_kwargs = model_init_kwargs or dict()
     model_fit_kwargs = model_fit_kwargs or dict()

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import os
 
 from cybench.config import (
     KEY_LOC,
@@ -73,6 +74,7 @@ def _add_period(df: pd.DataFrame, period_length: str):
     """
     # NOTE expects data column in string format
     # add a period column based on time step
+    print("period length", period_length)
     if period_length == "month":
         df["period"] = df["date"].dt.month
     elif period_length == "fortnight":
@@ -382,9 +384,29 @@ def design_features(
         **max_weather_aggrs,
     }
 
+    
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.width", None)
+    
     weather_fts = _aggregate_by_period(
         weather_df, index_cols, "period", weather_aggrs, {**avg_ft_cols, **max_ft_cols}
     )
+
+    # if not os.path.exists("df_columns.txt"):
+    #     with open("df_columns.txt", "w") as f:
+    #         f.write(str(weather_df.head(1)))
+    #         f.write("\n")
+    #         f.write("\n")
+    #         f.write(str(weather_fts.head(5)))
+    #         f.write("\n")
+    #         f.write("\n")
+    #         f.write("avg_weather_aggrs: " + str(avg_weather_aggrs) + "\n")
+    #         f.write("\n")
+    #         f.write("max_weather_aggrs: " + str(max_weather_aggrs) + "\n")
+    #         f.write("\n")
+    #         f.write("avg_ft_cols: " + str(avg_ft_cols) + "\n")
+    #         f.write("\n")
+    #         f.write("max_ft_cols: " + str(max_ft_cols) + "\n")
 
     count_thresh_cols = {
         "tmin": ["<", "0"],  # degrees
