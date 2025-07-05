@@ -1,11 +1,12 @@
-data copy
+data/
+data copy/
 output
 __pycache__
 api_keys
 .vscode
 *~
 *.cpg
-# *.csv
+#*.csv
 *.dbf
 *.html
 *.nc4
