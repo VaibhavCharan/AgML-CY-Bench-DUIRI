@@ -5,7 +5,7 @@ api_keys
 .vscode
 *~
 *.cpg
-*.csv
+# *.csv
 *.dbf
 *.html
 *.nc4
