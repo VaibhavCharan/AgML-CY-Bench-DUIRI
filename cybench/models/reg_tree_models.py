@@ -109,34 +109,6 @@ class RegressionTree(BaseModel):
 
         return saved_model
   
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # run_name = <run_name>
 # dataset_name = "maize_US"
 # result = run_benchmark(run_name=run_name, 
