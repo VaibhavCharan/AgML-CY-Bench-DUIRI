@@ -74,7 +74,7 @@ def _add_period(df: pd.DataFrame, period_length: str):
     """
     # NOTE expects data column in string format
     # add a period column based on time step
-    print("period length", period_length)
+    #print("period length", period_length)
     if period_length == "month":
         df["period"] = df["date"].dt.month
     elif period_length == "fortnight":
