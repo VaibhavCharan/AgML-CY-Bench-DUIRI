@@ -156,10 +156,6 @@ def run_benchmark(
 
     dataset = Dataset.load(dataset_name)
     all_years = sorted(dataset.years)
-    # print("Top 3 rows of dataset:")
-    # print(dataset._df_y.head(3))
-        
-        
 
     if sel_years is not None:
         assert all([yr in all_years for yr in sel_years])

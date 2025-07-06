@@ -1,1 +1,2 @@
 Placeholder
+poetry run python cybench/runs/run_benchmark.py -d maize_Indiana    
