@@ -7,6 +7,7 @@ from cybench.config import (
     KEY_LOC,
     KEY_YEAR,
     KEY_DATES,
+    KEY_COUNTRY,
     GDD_BASE_TEMP,
     GDD_UPPER_LIMIT,
     INIT_LAI,
@@ -352,10 +353,12 @@ def design_features(
         
         weather_df.loc[group.index, "bgr"] = dbt_list
         #print("for loc, year" + str(loc) + "," + str(year) + ", the dbt_list is: ", dbt_list)
-        
-
-    #print("first 20 lai values", weather_df["lai"].head(20))
     
+    country_two_letter_code = weather_df["adm_id"][0][:2] 
+    filepath = "cybench/data/maize/" + country_two_letter_code + "/meteo_lai_bgr.csv"
+    if not os.path.exists(filepath):
+        weather_df.to_csv(filepath, index=False)
+
     if fpar_df is not None:
         fpar_df = fpar_df.sort_values(by=index_cols + ["date"])
         fpar_df["fpar"] = fpar_df["fpar"].astype(float)

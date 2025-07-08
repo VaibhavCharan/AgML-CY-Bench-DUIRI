@@ -1,4 +1,5 @@
-data/
+cybench/data/
+model_results/
 output
 __pycache__
 api_keys

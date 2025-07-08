@@ -189,11 +189,11 @@ def run_benchmark(
             model.fit(train_dataset, **models_fit_kwargs[model_name])
             predictions, _ = model.predict(test_dataset)
             if test_year == all_years[-1]:
-                # print("len of predictions:", len(predictions))
-                # print("len of train_dataset:", len(train_dataset))
-                # print("labels", labels)
                 plt.figure(figsize=(8, 6))
                 plt.scatter(labels, predictions, label=model_name, alpha=0.7)
+                min_val = min(labels.min(), predictions.min())
+                max_val = max(labels.max(), predictions.max())
+                plt.plot([min_val, max_val], [min_val, max_val], 'r--', lw=1, label='Ideal')
                 plt.xlabel("Actual Yield")
                 plt.ylabel("Predicted Yield")
                 plt.title("Predicted vs Actual Yield")
@@ -201,10 +201,8 @@ def run_benchmark(
 
                 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
                 model_results_dir = os.path.join(project_root, "model_results")
-                #os.makedirs(model_results_dir, exist_ok=True)
                 plot_path = os.path.join(model_results_dir, f"pred_vs_actual_plot_{model_name}.png")
 
-                #plot_path = os.path.join(path_results, f"pred_vs_actual_plot_{model_name}.png")
                 plt.savefig(plot_path)
                 plt.close()
 
