@@ -328,6 +328,9 @@ def design_features(
             cum_tt += dtt
             if cum_tt <= TTL:
                 dlai = ALPHA * dtt * lai * max(LAIMAX - lai, 0)
+                if dlai < 0:
+                    print("Negative dLAI encountered, setting to 0")
+                    dlai = 0.0
                 lai += dlai
             lai_list.append(lai)
 

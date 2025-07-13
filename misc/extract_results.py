@@ -1,6 +1,6 @@
 from cybench.runs.run_benchmark import compute_metrics
 
-run_name = "maize_Indiana" 
+run_name = "maize_NL" 
 df_metrics = compute_metrics(run_name)
 
 print(
